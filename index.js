@@ -37,7 +37,7 @@ async function main() {
       viewEmployees();
       break
     case "Update employee roles":
-      updateEmployees();
+      updateEmployeesRole();
       break
     case "Update employee managers":
       updateManager();
@@ -141,4 +141,36 @@ async function viewEmployees() {
   console.table(employee)
   main()
 }
+
+async function updateEmployeesRole(){
+  let role = await db.query('SELECT * FROM role')
+  console.table(role)
+  let updateER = await inquirer.prompt([
+    {
+      type: "input",
+      name: "role_id",
+      message: "Which employee role would you like to update (by employee ID)"
+    },
+    {
+      type: "input",
+      name: "title",
+      message: "What is the new employee role title"
+    },
+    {
+      type: "input",
+      name: "salary",
+      message: "What is the new employee role salary"
+    },
+    {
+      type: "input",
+      name: "department_id",
+      message: "What is the new employee role department ID"
+    },
+  ])
+  await db.query('UPDATE role SET title=?, salary=?, department_id=? WHERE id=?', [updateER.title, updateER.salary, updateER.department_id, updateER.role_id])
+  console.log('Updated')
+  let updateRole = await db.query('SELECT * FROM role')
+  console.table(updateRole)
+}
+
 main()
