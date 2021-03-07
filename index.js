@@ -1,6 +1,6 @@
 const inquirer = require("inquirer");
 const mysql = require('mysql')
-const db = require( './app/connection' )('quotes_db','pass1234')
+const db = require( './app/connection' )('sql_employees','pass1234')
 const cTable  = require("console.table");
 
 
@@ -56,3 +56,89 @@ async function main() {
       break
   }
 }
+
+async function addDepartments(){
+  const newDepartment = await inquirer.prompt([
+    {
+      type: "input", 
+      name: "department", 
+      message: "Enter a New Department"
+    }
+  ])
+  await db.query('INSERT INTO department (name) VALUE (?)', [newDepartment.department])
+  let department = await db.query('SELECT * FROM department')
+  console.table(department)
+  main()
+}
+
+async function addRoles(){
+  const newRole = await inquirer.prompt([
+    {
+      type:"input",
+      name: "title",
+      message: "What is the employee title"
+    },
+    {
+      type:"input",
+      name: "salary",
+      message: "What is the employee salary"
+    },
+    {
+      type:"input",
+      name: "department_id",
+      message: "What is the employee department"
+    },
+  ])
+  await db.query('INSERT INTO role (title, salary, department_id) VALUE (?,?,?)', [newRole.title, newRole.salary, newRole.department_id])
+  let role = await db.query('SELECT * FROM role')
+  console.table(role)
+  main()
+}
+
+async function addEmployees(){
+  let newEmployee = await inquirer.prompt([
+    {
+      type: "input",
+      name: "first_name",
+      message: "What is employee first name?"
+    },
+    {
+      type: "input",
+      name: "last_name",
+      message: "What is employee last name?"
+    },
+    {
+      type: "input",
+      name: "role_id",
+      message: "What is thier role ID?"
+    },
+    {
+      type: "input",
+      name: "manager_id",
+      message: "Who is their manager?"
+    }
+  ])
+  await db.query('INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUE (?,?,?,?)', [newEmployee.first_name, newEmployee.last_name, newEmployee.role_id, newEmployee.manager_id])
+  let employee = await db.query('SELECT * FROM employee')
+  console.table(employee)
+  main()
+}
+
+async function viewDepartments() {
+  let department = await db.query('SELECT * FROM department')
+  console.table(department)
+  main()
+}
+
+async function viewRoles() {
+  let role = await db.query('SELECT * FROM role')
+  console.table(role)
+  main()
+}
+
+async function viewEmployees() {
+  let employee = await db.query('SELECT * FROM employee')
+  console.table(employee)
+  main()
+}
+main()
