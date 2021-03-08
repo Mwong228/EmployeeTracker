@@ -61,6 +61,8 @@ async function main() {
 }
 
 async function addDepartments(){
+  let department = await db.query('SELECT * FROM department')
+  console.table(department)
   const newDepartment = await inquirer.prompt([
     {
       type: "input", 
@@ -69,12 +71,15 @@ async function addDepartments(){
     }
   ])
   await db.query('INSERT INTO department (name) VALUE (?)', [newDepartment.department])
-  let department = await db.query('SELECT * FROM department')
-  console.table(department)
+  let departmentList = await db.query('SELECT * FROM department')
+  console.log('Updated')
+  console.table(departmentList)
   main()
 }
 
 async function addRoles(){
+  let role = await db.query('SELECT * FROM role')
+  console.table(role)
   const newRole = await inquirer.prompt([
     {
       type:"input",
@@ -93,12 +98,15 @@ async function addRoles(){
     },
   ])
   await db.query('INSERT INTO role (title, salary, department_id) VALUE (?,?,?)', [newRole.title, newRole.salary, newRole.department_id])
-  let role = await db.query('SELECT * FROM role')
-  console.table(role)
+  let roleList = await db.query('SELECT * FROM role')
+  console.log('Updated')
+  console.table(roleList)
   main()
 }
 
 async function addEmployees(){
+  let employee = await db.query('SELECT * FROM employee')
+  console.table(employee)
   let newEmployee = await inquirer.prompt([
     {
       type: "input",
@@ -122,8 +130,8 @@ async function addEmployees(){
     }
   ])
   await db.query('INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUE (?,?,?,?)', [newEmployee.first_name, newEmployee.last_name, newEmployee.role_id, newEmployee.manager_id])
-  let employee = await db.query('SELECT * FROM employee')
-  console.table(employee)
+  let employeeList = await db.query('SELECT * FROM employee')
+  console.table(employeeList)
   main()
 }
 
@@ -262,6 +270,62 @@ async function viewEmployeeByM(){
   console.log('Employees under this manager are:')
   console.table(employeeStructure)
   main()
+}
+
+async function deleteDepartment(){
+  let department = await db.query('SELECT * FROM department')
+  console.table(department)
+
+  const deleteDepartment = await inquirer.prompt([
+    {
+      type:"input",
+      name: "id",
+      message:"Which department would you like to delete (by ID)"
+    }
+  ])
+  await db.query('DELETE FROM department WHERE id=?', [deleteDepartment.id])
+  newDepartmentList = await db.query('Select * FROM department')
+  console.log('Updated')
+  console.table(newDepartmentList)
+  main()
+}
+
+async function deleteEmployees(){
+  let employee = await db.query('SELECT * FROM employee')
+  console.table(employee)
+
+  const deleteEmployee = await inquirer.prompt([
+    {
+      type:"input",
+      name: "id",
+      message:"Which employee would you like to delete (by ID)"
+    }
+  ])
+  await db.query('DELETE FROM employee WHERE id=?', [deleteEmployee.id])
+  newEmployeeList = await db.query('Select * FROM employee')
+  console.log('Updated')
+  console.table(newEmployeeList)
+  main()
+
+}
+
+async function deleteRoles(){
+  let role = await db.query('SELECT * FROM role')
+  console.table(role)
+
+  const deleteRole = await inquirer.prompt([
+    {
+      type:"input",
+      name: "id",
+      message:"Which role would you like to delete (by ID)"
+    }
+  ])
+  await db.query('DELETE FROM role WHERE id=?', [deleteRole.id])
+  newRoleList = await db.query('Select * FROM role')
+  console.log('Updated')
+  console.table(newRoleList)
+  main()
+
 }
 
 main()
