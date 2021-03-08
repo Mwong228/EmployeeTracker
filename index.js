@@ -11,7 +11,7 @@ async function main() {
       name: "choice",
       message: "What would you like to do?",
       choices: [
-        'Add departments', 'Add roles', 'Add employees', 'View departments', 'View roles', 'View employees', 'Update employee roles', 'Update employee managers', 'View employees by managers', 'Delete departments', 'Delete roles', 'Delete employees' 
+        'Add departments', 'Add roles', 'Add employees', 'View departments', 'View roles', 'View employees', 'Update employee info', 'Update employee roles', 'Update employee managers', 'View employees by managers', 'Delete departments', 'Delete roles', 'Delete employees' 
       ]
     } 
   ]);
@@ -36,6 +36,9 @@ async function main() {
     case "View employees":
       viewEmployees();
       break
+    case "Update employee info":
+      updateEmployeesInfo();
+      break
     case "Update employee roles":
       updateEmployeesRole();
       break
@@ -43,7 +46,7 @@ async function main() {
       updateManager();
       break
     case "View employees by managers":
-      viewManager();
+      viewEmployeeByM();
       break
     case "Delete departments":
       deleteDepartment();
@@ -142,10 +145,47 @@ async function viewEmployees() {
   main()
 }
 
+async function updateEmployeesInfo(){
+  let employeeInfo = await db.query('SELECT * FROM employee')
+  console.table(employeeInfo)
+  const updateEI = await inquirer.prompt([
+    {
+      type:"input",
+      name: "id",
+      message: "Which employee would you like to update (by ID)"
+    },
+    {
+      type: "input",
+      name: "first_name",
+      message: "what is the employee first name"
+    },
+    {
+      type: "input",
+      name: "last_name",
+      message: "What the employee last name"
+    },
+    {
+      type: "input",
+      name: "role_id",
+      message: "What is the role ID for the employee"
+    },
+    {
+      type: "input",
+      name: "manager_id",
+      message: "Who does the employee report to (Manager ID)"
+    }
+  ])
+  await db.query('UPDATE employee SET first_name=?, last_name=?, role_id=?, manager_id=? WHERE id=?', [updateEI.first_name, updateEI.last_name, updateEI.role_id, updateEI.manager_id, updateEI.id])
+  let updatedEI = await db.query('SELECT * FROM employee')
+  console.table(updatedEI)
+  main()
+}
+
+
 async function updateEmployeesRole(){
   let role = await db.query('SELECT * FROM role')
   console.table(role)
-  let updateER = await inquirer.prompt([
+  const updateER = await inquirer.prompt([
     {
       type: "input",
       name: "role_id",
@@ -171,6 +211,57 @@ async function updateEmployeesRole(){
   console.log('Updated')
   let updateRole = await db.query('SELECT * FROM role')
   console.table(updateRole)
+  main()
+}
+
+async function updateManager(){
+  let manager = await db.query('SELECT * FROM employee WHERE manager_id IS NULL')
+  console.table(manager)
+  
+  const updateManager = await inquirer.prompt([
+    {
+      type: "input",
+      name: "id",
+      message: "Which manager would you like to update (by ID)"
+    },
+    {
+      type: "input",
+      name: "first_name",
+      message: "what is the name of the Manager"
+    },
+    {
+      type: "input",
+      name: "last_name",
+      message: "What is the last name of the Manager"
+    },
+    {
+      type: "input",
+      name: "role_id",
+      message: "What is the role ID for the Manager"
+    },
+  ])
+  await db.query('UPDATE employee SET first_name=?, last_name=?, role_id=? WHERE id=?', [updateManager.first_name, updateManager.last_name, updateManager.role_id, updateManager.id])
+  let newManagerList = await db.query('SELECT * FROM employee WHERE manager_id IS NULL')
+  console.table(newManagerList)
+  main()
+}
+
+async function viewEmployeeByM(){
+  managerList = await db.query('SELECT * FROM employee WHERE manager_id IS NULL')
+  console.log('All managers')
+  console.table(managerList)
+  
+  const employeeByM = await inquirer.prompt([
+    {
+      type: "input",
+      name: "structure",
+      message: "Which Manager would you like to look at (by ID)"
+    }
+  ])
+  let employeeStructure = await db.query('SELECT * FROM employee WHERE manager_id=?', [employeeByM.structure])
+  console.log('Employees under this manager are:')
+  console.table(employeeStructure)
+  main()
 }
 
 main()
