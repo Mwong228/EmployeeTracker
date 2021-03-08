@@ -13,7 +13,7 @@ This application is connected via SQL database to help track employee informatio
 ## Installation
 * npm install 
 * Change db password your SQL password 
-const db = require( './app/connection' )('sql_employees','pass1234')
+* const db = require( './app/connection' )('sql_employees','pass1234')
 
 ## Demo
 * [Watch a Demonstration](https://drive.google.com/file/d/1DhhcK5y9u6-s63XoMY09tSPtCUGKyEqq/view)
